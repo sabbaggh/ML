@@ -23,17 +23,17 @@ xT = x.T
 Q = np.dot(x,xT)
 b = np.dot(-2*x,y)
 w0 = rng.normal(size=(4,1))
-alfa = 0.00001
+alfa = 0.000001
 ep = 1
-plt.scatter(x[0,:],x[1,:])
-plt.show()
-'''while ep > alfa:
+#plt.scatter(x[0,:],x[1,:])
+#plt.show()
+while ep > 1e-6:
     G = np.dot(2*Q,w0)+b
     wn = w0-alfa*G
     xddd = wn-w0
     ep = np.linalg.norm(xddd)
     w0 = wn
-    print(wn)'''
+    print(wn)
 
 
 
