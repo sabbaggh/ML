@@ -4,11 +4,11 @@ close all
 warning off all
 
 %se leen los datos del dataset
-datos = csvread('6 class csv.csv');
+datos = csvread('6 class csv2.csv');
 %se acomodan
 datos = sortrows(datos,5);
 [m,n]=size(datos);
-pruebass = csvread('pruebas.csv');
+pruebass = csvread('pruebas2.csv');
 xpruebas = pruebass(:,:)'; 
 y = zeros(m,1);
 %Creamos el vector de etiquetas y
@@ -17,20 +17,17 @@ y = datos(:,5);
 x = datos(:,1:4)';
 xT = x';
 
-%view(3)
-%scatter(x(4,:),y(:,1))
+scatter(x(4,:),y(:,1))
 xlabel('Temperatura')
 ylabel('Etiquetas')
+%Se buscan los indices que no tengan etiqueta 1 o 2 y los que tengan
+%etiqueta 1 o 2, esto para juntar dos clases, la 1 con 2 y la 3 con 4
 indices = ~ismember(y, [1, 2]);
 indices2 = ismember(y,[1, 2]);
-%se cambian todos los indices de y que no sean 1 para tener solamente dos
-%clases
+%se cambian las etiquetas de acuerdo a los indices que obtuvimos
 y(indices) = -1;
 y(indices2) = 1;
 
-matrizEig = xT*x;
-eigenvalores = eig(matrizEig);
-maxEig = max(eigenvalores);
 %Creacion del vector inicial w con valores random
 w0 = randn(4,1);
 ep = 1;
@@ -39,11 +36,12 @@ count = 0;
 
 while ep > 1e-6
     grad = calcGrad(x,y,w0);
-    wn = w0 - alfa*grad
+    wn = w0 - alfa*grad;
     ep = sqrt((wn-w0)'*(wn-w0));
     w0 = wn;
-    count = count+1
+    count = count+1;
 end
+fprintf('Iteraciones %d\n', count)
 test = prueba(xpruebas,wn);
 
 
@@ -71,13 +69,16 @@ function diagonal = calcdiag(x,w,xT)
     end
     %diagonal = diag(daigonales)
 end
-
+%Funcion para calcular la precision del modelo
 function precision = prueba(xPrueba,wn)
     [n, m] = size(xPrueba);
-    %xPrueba = xPrueba';
+    %Se hace la transpuesta del wn obtenido
     wT = wn';
+    %Contador para llevar la cuenta de predicciones correctas
     correcto = 0;
+    %Se ira recorriendo los vectores de prueba 
     for i =1:m
+        %Se calcula la hipotesis
         h = wT*xPrueba(1:4,i)
         if h > 0 && (xPrueba(5,i) ==1 || xPrueba(5,i) ==2)
             correcto = correcto+1;

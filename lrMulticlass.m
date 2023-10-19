@@ -13,14 +13,11 @@ xpruebas = pruebass(:,:)';
 
 numClases = 4;
 vectoresSolucion = zeros(4,numClases-1);
-alfa = 0.1;
+alfa = 0.000001;
 
 for i =1:numClases-1
     datos = calcVector(datos,i);
     x=datos(:,1:4)';
-    %mu = mean(x, 2);
-    %sigma = std(x, 0, 2);
-    %x = (x - mu) ./ sigma;
     y=datos(:,5);
     indices = ~ismember(y, i);
     indices2 = ismember(y,i);
