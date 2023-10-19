@@ -2,7 +2,6 @@ clc
 clear all
 close all
 warning off all
-
 %se leen los datos del dataset
 datos = csvread('6 class csv2.csv');
 %se acomodan
@@ -16,9 +15,10 @@ y = datos(:,5);
 %Se crea la matriz de los vectores de caracteristicas x
 x = datos(:,1:4)';
 xT = x';
-
-scatter(x(4,:),y(:,1))
-xlabel('Temperatura')
+hold on
+grid on
+scatter(x(4,:),y(:,1),'go',MarkerFaceColor='g')
+xlabel('Magnitud')
 ylabel('Etiquetas')
 %Se buscan los indices que no tengan etiqueta 1 o 2 y los que tengan
 %etiqueta 1 o 2, esto para juntar dos clases, la 1 con 2 y la 3 con 4
@@ -30,22 +30,27 @@ y(indices2) = 1;
 
 %Creacion del vector inicial w con valores random
 w0 = randn(4,1);
+%Epsilon inicial
 ep = 1;
+%Se usa el mismo alfa de la practica anterior
 alfa = 0.000001;
+%Contador para ver el numero de iteraciones
 count = 0;
 
+%Se realiza el proceso del gradiente descendiente
 while ep > 1e-6
     grad = calcGrad(x,y,w0);
     wn = w0 - alfa*grad;
     ep = sqrt((wn-w0)'*(wn-w0));
     w0 = wn;
-    count = count+1;
+    count = count+1;    
 end
 fprintf('Iteraciones %d\n', count)
 test = prueba(xpruebas,wn);
 
-
 %FUNCIONES A USAR
+%Se hace una funcion para calcular el gradiente, esta se manda a llamar en
+%cada iteracion del proceso de gradiente descendiente
 function gradiente = calcGrad(x, y, w)
     [m,n] = size(y);
     suma = 0;
@@ -58,17 +63,6 @@ function gradiente = calcGrad(x, y, w)
     gradiente =(1/m)*suma;
 end
 
-
-
-function diagonal = calcdiag(x,w,xT)
-    [m,n] = size(xT);
-    wT = w';
-    daigonales = zeros(1,m);
-    for i = 1:m
-        xdd = (1/(1+exp(-wT*x(:,i))))*(1-(1/(1+exp(-w'*x(:,i)))))
-    end
-    %diagonal = diag(daigonales)
-end
 %Funcion para calcular la precision del modelo
 function precision = prueba(xPrueba,wn)
     [n, m] = size(xPrueba);
@@ -78,7 +72,9 @@ function precision = prueba(xPrueba,wn)
     correcto = 0;
     %Se ira recorriendo los vectores de prueba 
     for i =1:m
-        %Se calcula la hipotesis
+        %Se calcula la hipotesis y si es mayor a cero y ademas su etiqueta
+        %es 1 o 2 se considera como correcta, si es menor a 0 la hipotesis
+        %y ademas su etiqueta es 3 o 4 entonces se considera como correcta
         h = wT*xPrueba(1:4,i)
         if h > 0 && (xPrueba(5,i) ==1 || xPrueba(5,i) ==2)
             correcto = correcto+1;
