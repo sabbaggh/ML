@@ -4,6 +4,7 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 import random
+import copy
 
 #Cargar dataset
 df = pd.read_csv('6 class csv2.csv')
@@ -85,40 +86,29 @@ def cruza(poblacion):
         hijos = np.vstack([hijos, hijo1, hijo2])
     #Se resetean las precisiones a 0
     hijos[:,4] = 0
-    print(hijos)
     return hijos
 
+def mutacion(poblacion):
+    genesMutacion = np.random.randint(4,size=individuos)
+    print(genesMutacion)
+    for i in range(individuos):
+        if poblacion[i,genesMutacion[i]] == 1:
+            poblacion[i, genesMutacion[i]] = 0
+        else:
+            poblacion[i, genesMutacion[i]] = 1
+    return poblacion
+
+
 poblacionEvaluada = evaluacion(poblacionInicial)
-cruza(poblacionEvaluada)
+poblacionAMutar = copy.deepcopy(poblacionEvaluada)
+poblacionMutada = mutacion(poblacionAMutar)
+hijos = cruza(poblacionEvaluada)
+print(poblacionEvaluada)
+print(poblacionMutada)
+print(hijos)
 
-#se hace un ciclo for para el numero de folds
-'''for i in range(k):
-    #Se definen los valores de prueba y de entrenamiento y se normalizan
-    Xprueba = X[i*tamFolds:(i+1)*tamFolds,:]
-    Xentrenamiento = np.delete(X,slice(i*tamFolds,(i+1)*tamFolds),0)
-    Xentrenamiento = scaler.fit_transform(Xentrenamiento)
-    Xprueba = scaler.transform(Xprueba)
-    Yprueba = Y[i*tamFolds:(i+1)*tamFolds]
-    Yentrenamiento = np.delete(Y, slice(i*tamFolds,(i+1)*tamFolds),0)
-    #se ajusta el modelo de SVM a nuestros valores de entrenamiento
-    maquinaSoporte.fit(Xentrenamiento,Yentrenamiento)
-    #Se calcula la precision de cada modelo
-    precisionSVM = maquinaSoporte.score(Xprueba,Yprueba)
-    precisionRegLog = regLog.score(Xprueba, Yprueba)
-    precisionBayes = bayes.score(Xprueba, Yprueba)
-    precisionRed = redNeuronal.score(Xprueba,Yprueba)
-    #Se actualiza el error total
-    errorSVM = errorSVM + 1 - precisionSVM
-    errorregLog = errorregLog + 1 - precisionRegLog
-    errorBayes = errorBayes + 1 - precisionBayes
-    errorRed = errorRed + 1 - precisionRed
-    #Se imprime la precision de cada modelo en cada fold
-    print(f'Precision de SVM en el fold {i+1} {precisionSVM*100}%')
-    print(f'Precision de Regresion Logistica en el fold {i+1} {precisionRegLog*100}%')
-    print(f'Precision de Bayes en el fold {i+1} {precisionBayes*100}%')
-    print(f'Precision de la Red Neuronal en el fold {i + 1} {precisionRed * 100}%')
-    print()
+def algoritmoGenetico():
+    diferencia = 100
+    epsi = 0.00001
+    while diferencia>epsi:
 
-errorPromSVM = (errorSVM/k)*100
-
-print(f'Error promedio en SVM {errorPromSVM}%')'''
